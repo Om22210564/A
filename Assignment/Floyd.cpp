@@ -1,67 +1,53 @@
-#include <stdio.h>
-#include <stdlib.h>
-void floydWarshall(int **graph, int n)
-{
-    int i, j, k;
-    for (k = 0; k < n; k++)
-    {
-        for (i = 0; i < n; i++)
-        {
-            for (j = 0; j < n; j++)
-            {
-                if (graph[i][j] > graph[i][k] + graph[k][j])
-                    graph[i][j] = graph[i][k] + graph[k][j];
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void floydWarshall(vector<vector<int>>& graph, int n) {
+    // Initialize the distance matrix with the input graph
+    vector<vector<int>> dist = graph;
+
+    // Floyd-Warshall Algorithm
+    for (int k = 0; k < n; ++k) {
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                // Skip if there's no path from i to k or k to j
+                if (dist[i][k] == -1 || dist[k][j] == -1) continue;
+
+                // Update the shortest path from i to j
+                if (dist[i][j] == -1 || dist[i][j] > dist[i][k] + dist[k][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                }
             }
         }
     }
-}
-int main(void)
-{
-    int n, i, j;
-    printf("Enter the number of vertices: ");
-    scanf("%d", &n);
-    int **graph = (int **)malloc((long unsigned) n * sizeof(int *));
-    for (i = 0; i < n; i++)
-    {
-        graph[i] = (int *)malloc((long unsigned) n * sizeof(int));
-    }
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            if (i == j)
-                graph[i][j] = 0;
+
+    // Print the result
+    cout << "Shortest distances between every pair of vertices:\n";
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (dist[i][j] == -1)
+                cout << "INF ";
             else
-                graph[i][j] = 100;
+                cout << dist[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    int n; // Number of vertices
+    cout << "Enter the number of vertices: ";
+    cin >> n;
+
+    vector<vector<int>> graph(n, vector<int>(n));
+    cout << "Enter the adjacency matrix (-1 for no direct path):\n";
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cin >> graph[i][j];
         }
     }
-    printf("Enter the edges: \n");
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            printf("[%d][%d]: ", i, j);
-            scanf("%d", &graph[i][j]);
-        }
-    }
-    printf("The original graph is:\n");
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            printf("%d ", graph[i][j]);
-        }
-        printf("\n");
-    }
+
     floydWarshall(graph, n);
-    printf("The shortest path matrix is:\n");
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            printf("%d ", graph[i][j]);
-        }
-        printf("\n");
-    }
+
     return 0;
 }
